@@ -1,3 +1,4 @@
+# at the moment, the game only works in Windows
 from random import randint as rand # to generate random "food"
 from platform import system as plat # to known the platform
 
@@ -7,6 +8,48 @@ def dimensions(board, x = 20,y = 10): # initializes the board with empty posisio
         for column in range(x):
             tablero[row].append(0)
 
+def reset(board):
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            board[i][j] = 0            
+            
+def display(board, snake, food): # displays the board
+    # the board is a multidimensional attay of integers
+    # 0 -> nothing
+    # 1 -> head of the snake
+    # 2 -> body of the snake
+    # 3 -> food
+
+    reset(board)
+    
+    head = ["▲","◄","▼","►"]
+
+    board[snake[1][0][0]][snake[1][0][1]] = 1
+
+    if(len(snake[1]) > 1):
+        for x,y in snake[1][1:]:
+            board[x][y] = 2
+    
+    board[food[0]][food[1]] = 3
+
+    print(" - " * (len(board[0]) + 1))
+    for i in range(len(board)):
+        print("|",end="")
+        for j in range(len(board[0])):
+            current = board[i][j]
+            if(current == 0):
+                print(" "," ", end = "")
+            elif(current == 1):
+                print(head[snake[0] - 1]," ", end = "")
+            elif(current == 2):
+                print("o"," ", end = "")
+            elif(current == 3):
+                print("*"," ", end = "")
+        else:
+            print("|")
+    else:
+        print(" - " * (len(board[0]) + 1))            
+            
 def run(difficulty): # returns total score
     clean_screen = "cls" if(plat() == 'Windows') else "clear" # gets the method to clean screen depending on the platform
     snake = [rand(3,4),[[0,0]]] # initialize the snake in the upper left corner
@@ -14,7 +57,7 @@ def run(difficulty): # returns total score
     # the body its compound by the head in the first position and the rest of the body for the following positions (arrays)
     board = [] # main board  
     x, y = 0, 0  # board dimensions
-    continue = True # controls the game cycle
+    cont = True # controls the game cycle
     food = False # indicates if there's food in the board
     score = 0
 
@@ -37,7 +80,7 @@ def run(difficulty): # returns total score
 
     input("\nGAME READY\nPress ENTER to play\nSPACE or ENTER to exit (while playing)...")
     
-    while(continue):
+    while(cont):
         sys(clean_screen) # cleans the screen
 
         if(not food): # slice to generate food in the board
@@ -45,24 +88,24 @@ def run(difficulty): # returns total score
             while(food in snake[1]): # verifies that the food has not appeared inside the snake
                 food = [rand(0,y-1), rand(0, x-1)]
 
-                if(len(snake[1]) == (x * y)): # si la serpiente ocupa todo el tablero
+                if(len(snake[1]) == (x * y)): # if the snake occupies the whole board
                    return [x*y]
-            hay_comida = True
+            food = True
 
-        mostrar(tablero,serpiente,comida) # imprime el tablero
-        boton = tecla(dificultad) # obtiene la tecla presionado
-        if(boton == -1): # si se presionó ESPACIO / ENTER
-            continuar = False
+        display(board,snake,food) # displays the board
+        button = key(difficulty) # gets the pressed key
+        if(button == -1): # if SPACE / ENTER was pressed
+             cont = False
         else:
-            siguiente = desplazamiento(tablero, serpiente, boton, comida) # mueve la serpiente dependiendo de la entrada
+            next_iter = displacement(board, snake, button, food) # displaces the snake depending off the keyboard entry
 
-            if(siguiente == 1): # comió la serpiente
-                puntos += 1
-                hay_comida = False
-            elif(siguiente == -1): # hubo colisión
-                continuar = False
+            if(cont == 1): # the snake ate
+                score += 1
+                food = False
+            elif(cont == -1): # a collision occured
+                cont = False
 
-    return puntos
+    return score
 
 def play(): # driver function that returns total score
     difficulty = 0
