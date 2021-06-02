@@ -1,4 +1,5 @@
 # at the moment, the game only works in Windows
+
 from random import randint as rand # to generate random "food"
 from platform import system as plat # to known the platform
 from os import system as sys # to update the screen
@@ -70,7 +71,66 @@ def display(board, snake, food): # displays the board
             print("|")
     else:
         print(" - " * (len(board[0]) + 1))            
-            
+
+def propagate(previous, current, food): # updates the positions of the snake
+    holder = []
+    val = 0
+    previous = eval(anterior)
+
+    if(food != current[1][0]):
+        if(len(previous) != 0):
+            del previous[-1]
+    else:
+        val = 1
+
+    holder.append(current[1][0])
+    for o in previous:
+        holder.append(o)
+
+    current[1] = eval(str(holder))
+
+    return val
+
+def displacement(board, snake, new_direct, food): # gives direction to the snake and checks if it ate
+    direction = int(str(snake[0]))
+    old_body = str(snake[1])
+
+    if(new_direct != 0): # if theres acceleration or direction change
+        if((new_direct == 1 and direction == 3) or
+           (new_direct == 2 and direction == 4) or
+           (new_direct == 3 and direction == 1) or
+           (new_direct == 4 and direction == 2)):
+            displacement(board, snake, 0, food)
+        
+        if(new_direct == 1 and direction != 3):
+            snake[1][0][0] -= 1
+        elif(new_direct == 2 and direction != 4):
+            snake[1][0][1] -= 1
+        elif(new_direct == 3 and direction != 1):
+            snake[1][0][0] += 1
+        elif(new_direct == 4 and direction != 2):
+            snake[1][0][1] += 1
+
+        snake[0] = new_direct
+    elif(new_direct == 0): # if the snake continues in the same direction
+        if(direction == 1):
+            snake[1][0][0] -= 1
+        elif(direction == 2):
+            snake[1][0][1] -= 1
+        elif(direction == 3):
+            snake[1][0][0] += 1
+        elif(direction == 4):
+            snake[1][0][1] += 1
+
+    if(snake[1][0][0] < 0 or
+       snake[1][0][1] < 0 or
+       snake[1][0][0] >= len(board) or
+       snake[1][0][1] >= len(board[0]) or
+       snake[1][0] in snake[1][1:]):
+        return -1
+
+    return propagate(old_body, snake, food)        
+        
 def run(difficulty): # returns total score
     clean_screen = "cls" if(plat() == 'Windows') else "clear" # gets the method to clean screen depending on the platform
     snake = [rand(3,4),[[0,0]]] # initialize the snake in the upper left corner
