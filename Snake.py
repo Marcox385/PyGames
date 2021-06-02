@@ -1,6 +1,27 @@
 # at the moment, the game only works in Windows
 from random import randint as rand # to generate random "food"
 from platform import system as plat # to known the platform
+from os import system as sys # to update the screen
+from time import time as t # for time between keys
+import msvcrt # to detect keys
+
+def key(difficulty): # captures the pressed key
+    start = t()
+    while(True):
+        if(msvcrt.kbhit()):
+            entry = msvcrt.getch()
+            if(entry == b'H' or entry == b'w' or entry == b'W'):    # UP
+                return 1
+            elif(entry == b'K' or entry == b'a' or entry == b'A'):    # LEFT
+                return 2
+            elif(entry == b'P' or entry == b's' or entry == b'S'):    # DOWN
+                return 3
+            elif(entry == b'M' or entry == b'd' or entry == b"D"):    # RIGHT
+                return 4
+            elif(entry == b' ' or entry == b'\r'):
+                return -1
+        elif(t() - start >= (1/difficulty)):
+            return 0
 
 def dimensions(board, x = 20,y = 10): # initializes the board with empty posisions
     for row in range(y):
